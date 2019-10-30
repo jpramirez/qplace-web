@@ -159,7 +159,7 @@ export default {
     name: 'HomePlans',
     methods: {
         showRecipes(plan) {
-            this.$store.dispatch('getRecipes', plan);
+            this.$store.dispatch('getItems', plan);
         }
     }
 };

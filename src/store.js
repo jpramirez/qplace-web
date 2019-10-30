@@ -8,15 +8,15 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        recipes: [],
-        apiUrl: 'https://api.edamam.com/search',
+        Items: [],
+        apiUrl: 'https://api.epyphite.local/api/v1/',
         user: null,
         isAuthenticated: false,
-        userRecipes: []
+        userItems: []
     },
     mutations: {
-        setRecipes(state, payload) {
-            state.recipes = payload;
+        setItems(state, payload) {
+            state.Items = payload;
         },
         setUser(state, payload) {
             state.user = payload;
@@ -24,20 +24,16 @@ export default new Vuex.Store({
         setIsAuthenticated(state, payload) {
             state.isAuthenticated = payload;
         },
-        setUserRecipes(state, payload) {
-            state.userRecipes = payload;
+        setUserItems(state, payload) {
+            state.userItems = payload;
         }
     },
     actions: {
-        async getRecipes({ state, commit }, plan) {
+        async getItems({ state, commit }, userid) {
             try {
                 let response = await axios.get(`${state.apiUrl}`, {
                     params: {
-                        q: plan,
-                        app_id: '5b6623d5',
-                        app_key: '46674aa2193dbb7b88ffd897331e661a',
-                        from: 0,
-                        to: 9
+                        userid: userid
                     }
                 });
                 // sbdinc keys
@@ -50,12 +46,40 @@ export default new Vuex.Store({
                 //         to: 9
                 //     }
                 // });
-                commit('setRecipes', response.data.hits);
+                commit('setItems', response.data);
             } catch (error) {
                 commit('setRecipes', []);
             }
         },
         userLogin({ commit }, { email, password }) {
+            const URL = 'https://api.epyphite.local/api/v1/login';
+            const data = { email, password };
+
+            axios({
+                method: 'post',
+                url: URL,
+                headers: {
+                    Accept: 'application/json',
+                    Content: 'application/json'
+                },
+                data: data
+            })
+                .then(res => {
+                    // eslint-disable-next-line
+                    console.log(res.data["ResponseData"][0]);
+                    sessionStorage.setItem('user', res.data["ResponseData"][0]);
+                    commit('setUser', res.data["ResponseData"][0]);
+                    commit('setIsAuthenticated', true);
+                    router.push('/about');
+                })
+                .catch(err => {
+                    alert('Wrong email/password');
+                    commit('setUser', null);
+                    commit('setIsAuthenticated', false);
+                    // eslint-disable-next-line
+                  console.log(err)
+                });
+            /*
             firebase
                 .auth()
                 .signInWithEmailAndPassword(email, password)
@@ -69,8 +93,35 @@ export default new Vuex.Store({
                     commit('setIsAuthenticated', false);
                     router.push('/');
                 });
+                */
         },
         userJoin({ commit }, { email, password }) {
+
+
+            const URL = 'https://api.epyphite.local/api/v1/create/user';
+            const data = { email, password };
+            axios({
+                method: 'POST',
+                url: URL,
+                headers: {
+                    AdminToken: '34806ab0-0a0c-4625-aef4-284e8dc06e27',
+                    Accept: 'application/json',
+                    Content: 'application/json'
+                },
+                data: data
+            })
+                .then(res => {
+                    // eslint-disable-next-line
+                    console.log(res.data["ResponseData"]);
+                    commit('setUser', res.data["ResponseData"]);
+                    commit('setIsAuthenticated', true);
+                    router.push('/about');
+                })
+                .catch(err => {
+                    // eslint-disable-next-line
+                console.log(err)
+                });
+            /*
             firebase
                 .auth()
                 .createUserWithEmailAndPassword(email, password)
@@ -84,36 +135,44 @@ export default new Vuex.Store({
                     commit('setIsAuthenticated', false);
                     router.push('/');
                 });
+                */
         },
         userSignOut({ commit }) {
+            commit('setUser', null);
+            commit('setIsAuthenticated', false);
+            router.push('/');
+            /*
             firebase
                 .auth()
                 .signOut()
                 .then(() => {
-                    commit('setUser', null);
-                    commit('setIsAuthenticated', false);
-                    router.push('/');
+
                 })
                 .catch(() => {
                     commit('setUser', null);
                     commit('setIsAuthenticated', false);
                     router.push('/');
                 });
+                */
         },
-        addRecipe({ state }, payload) {
+        setItem({ state }, payload) {
+            /*
             firebase
                 .database()
                 .ref('users')
                 .child(state.user.user.uid)
                 .push(payload.recipe.label);
+                */
         },
         getUserRecipes({ state, commit }) {
-            return firebase
-                .database()
-                .ref('users/' + state.user.user.uid)
-                .once('value', snapshot => {
-                    commit('setUserRecipes', snapshot.val());
-                });
+            const URL = state.apiUrl + "/" + state.user.agent + "/files" 
+            axios({
+                method: 'GET',
+                url: URL,
+                headers: {
+                    Accept: 'application/json'
+                }
+            })
         }
     },
     getters: {

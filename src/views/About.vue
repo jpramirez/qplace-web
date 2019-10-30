@@ -4,7 +4,7 @@
             <h1 class="title my-3">My Audio - </h1>
             <upload></upload>
             <div
-                v-for="(item, idx) in userRecipes"
+                v-for="(item, idx) in userItems"
                 class="subheading mb-2"
                 :key="idx"
             >
@@ -27,16 +27,16 @@ export default {
         Upload
     },
     computed: {
-        userRecipes() {
-            return this.$store.state.userRecipes;
+        userItems() {
+            return this.$store.state.userItems;
         }
     },
     mounted() {
-        this.getRecipes();
+        this.getItems();
     },
     methods: {
-        getRecipes() {
-            this.$store.dispatch('getUserRecipes');
+        getItems() {
+            this.$store.dispatch('getUserItems');
         }
     }
 };
