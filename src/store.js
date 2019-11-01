@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
-import firebase from 'firebase';
 import router from '@/router';
 
 Vue.use(Vuex);
@@ -36,16 +35,6 @@ export default new Vuex.Store({
                         userid: userid
                     }
                 });
-                // sbdinc keys
-                // let response = await axios.get(`${state.apiUrl}`, {
-                //     params: {
-                //         q: plan,
-                //         app_id: '903de977',
-                //         app_key: '1b5fbf78de2db637b392f141c524222c\t',
-                //         from: 0,
-                //         to: 9
-                //     }
-                // });
                 commit('setItems', response.data);
             } catch (error) {
                 commit('setRecipes', []);
@@ -66,10 +55,7 @@ export default new Vuex.Store({
             })
                 .then(res => {
                     // eslint-disable-next-line
-                    console.log(res.data["ResponseData"][0]);
-                    sessionStorage.setItem('user', res.data["ResponseData"][0]);
-                    commit('setUser', res.data["ResponseData"][0]);
-                    commit('setIsAuthenticated', true);
+                    sessionStorage.setItem('token', res.data.token);
                     router.push('/about');
                 })
                 .catch(err => {
@@ -104,7 +90,7 @@ export default new Vuex.Store({
                 method: 'POST',
                 url: URL,
                 headers: {
-                    AdminToken: '34806ab0-0a0c-4625-aef4-284e8dc06e27',
+                    AdminToken: '232ffc5b-2903-46ce-bc95-e678117c4402',
                     Accept: 'application/json',
                     Content: 'application/json'
                 },
@@ -112,8 +98,8 @@ export default new Vuex.Store({
             })
                 .then(res => {
                     // eslint-disable-next-line
-                    console.log(res.data["ResponseData"]);
-                    commit('setUser', res.data["ResponseData"]);
+                    console.log(res.data["ResponseData"]['userid']);
+                    commit('setUser', res.data["ResponseData"]['userid']);
                     commit('setIsAuthenticated', true);
                     router.push('/about');
                 })
@@ -121,51 +107,17 @@ export default new Vuex.Store({
                     // eslint-disable-next-line
                 console.log(err)
                 });
-            /*
-            firebase
-                .auth()
-                .createUserWithEmailAndPassword(email, password)
-                .then(user => {
-                    commit('setUser', user);
-                    commit('setIsAuthenticated', true);
-                    router.push('/about');
-                })
-                .catch(() => {
-                    commit('setUser', null);
-                    commit('setIsAuthenticated', false);
-                    router.push('/');
-                });
-                */
+
         },
         userSignOut({ commit }) {
             commit('setUser', null);
             commit('setIsAuthenticated', false);
             router.push('/');
-            /*
-            firebase
-                .auth()
-                .signOut()
-                .then(() => {
-
-                })
-                .catch(() => {
-                    commit('setUser', null);
-                    commit('setIsAuthenticated', false);
-                    router.push('/');
-                });
-                */
         },
         setItem({ state }, payload) {
-            /*
-            firebase
-                .database()
-                .ref('users')
-                .child(state.user.user.uid)
-                .push(payload.recipe.label);
-                */
         },
         getUserRecipes({ state, commit }) {
-            const URL = state.apiUrl + "/" + state.user.agent + "/files" 
+            const URL = state.apiUrl + '/' + state.user.agent + '/files';
             axios({
                 method: 'GET',
                 url: URL,
@@ -173,6 +125,15 @@ export default new Vuex.Store({
                     Accept: 'application/json'
                 }
             })
+                .then(res => {
+                    // eslint-disable-next-line
+                console.log(res.data["ResponseData"]);
+                    commit('setUserItems', res.data['ResponseData']);
+                })
+                .catch(err => {
+                    // eslint-disable-next-line
+            console.log(err)
+                });
         }
     },
     getters: {
