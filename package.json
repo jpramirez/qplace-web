@@ -13,7 +13,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0-rc.1",
     "@xkeshi/image-compressor": "^0.5.3",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "cropperjs": "^1.5.6",
     "firebase": "^6.4.2",
     "v-file-upload": "^3.1.7",
